@@ -9,9 +9,9 @@ using UnityStandardAssets.CrossPlatformInput;
 public class Player : MonoBehaviour
 {
 	// Configs
-	[FormerlySerializedAs("runSpeed")] [SerializeField] private float _runSpeed = 5f;
-
-	[FormerlySerializedAs("jumpSpeed")] [SerializeField] private float _jumpSpeed = 5f;
+	[SerializeField] private float _runSpeed = 5f;
+	[SerializeField] private float _jumpSpeed = 5f;
+	[SerializeField] private float _climbSpeed = 5f;
 	// State
 	private bool isAlive = true;
 	
@@ -19,7 +19,7 @@ public class Player : MonoBehaviour
 	private Rigidbody2D _playerRigidBody;
 	private Animator _playerAnimator;
 	private Collider2D _playerCollider;
-	
+
 	// Use this for initialization
 	private void Start ()
 	{
@@ -34,6 +34,7 @@ public class Player : MonoBehaviour
 		Run();
 		Jump();
 		FlipSprite();
+		ClimbLadder();
 	}
 
 	// Methods
@@ -50,6 +51,7 @@ public class Player : MonoBehaviour
 
 	private void Jump()
 	{
+		//don't want to jump if we are already jumping
 		if (!_playerCollider.IsTouchingLayers(LayerMask.GetMask("Foreground"))) { return; }
 		
 		if(CrossPlatformInputManager.GetButtonDown(("Jump")))
@@ -57,6 +59,20 @@ public class Player : MonoBehaviour
 			var jumpVelocityToAdd = new Vector2(0f, _jumpSpeed);
 			_playerRigidBody.velocity += jumpVelocityToAdd;
 		}
+	}
+
+	private void ClimbLadder()
+	{
+		//don't want to climb if we are already climbing something
+		if (!_playerCollider.IsTouchingLayers(LayerMask.GetMask("Climbing"))) { return; }
+
+		var controlThrow = CrossPlatformInputManager.GetAxis("Vertical");
+		var climbVelocity = new Vector2(_playerRigidBody.velocity.x, controlThrow * _climbSpeed);
+
+		_playerRigidBody.velocity = climbVelocity;
+
+		var playerHasVerticalSpeed = Mathf.Abs(_playerRigidBody.velocity.y) > Mathf.Epsilon;
+		_playerAnimator.SetBool("Climbing", playerHasVerticalSpeed);
 	}
 	
 	private void FlipSprite()
