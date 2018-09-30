@@ -22,7 +22,6 @@ public class Player : MonoBehaviour
 	private Collider2D _playerCollider;
 	private float _gravityScaleAtStart;
 
-	// Use this for initialization
 	private void Start ()
 	{
 		_playerRigidBody = GetComponent<Rigidbody2D>();
@@ -31,7 +30,6 @@ public class Player : MonoBehaviour
 		_gravityScaleAtStart = _playerRigidBody.gravityScale;
 	}
 	
-	// Update is called once per frame
 	private void Update ()
 	{
 		Run();
@@ -43,11 +41,9 @@ public class Player : MonoBehaviour
 	// Methods
 	private void Run()
 	{
-		var controlThrow = CrossPlatformInputManager.GetAxis("Horizontal"); //value is between -1 and +1
+		var controlThrow = CrossPlatformInputManager.GetAxis("Horizontal");
 		var playerVelocity = new Vector2(controlThrow * _runSpeed, _playerRigidBody.velocity.y);
 		_playerRigidBody.velocity = playerVelocity;
-		
-		//set animation to running if player is moving
 		var playerHasHorizontalSpeed = Mathf.Abs(_playerRigidBody.velocity.x) > Mathf.Epsilon;
 		_playerAnimator.SetBool("Running", playerHasHorizontalSpeed);	
 	}
@@ -78,7 +74,6 @@ public class Player : MonoBehaviour
 		var climbVelocity = new Vector2(_playerRigidBody.velocity.x, controlThrow * _climbSpeed);
 		_playerRigidBody.velocity = climbVelocity;
 		_playerRigidBody.gravityScale = 0f;
-
 		var playerHasVerticalSpeed = Mathf.Abs(_playerRigidBody.velocity.y) > Mathf.Epsilon;
 		_playerAnimator.SetBool("Climbing", playerHasVerticalSpeed);
 	}
