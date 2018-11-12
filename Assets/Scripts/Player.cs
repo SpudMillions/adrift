@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.Animations;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityStandardAssets.CrossPlatformInput;
@@ -100,6 +99,7 @@ public class Player : MonoBehaviour
 			isAlive = false;
 			_playerAnimator.SetTrigger("Dying");
 			GetComponent<Rigidbody2D>().velocity = _deathKick;	
+			FindObjectOfType<GameSession>().ProcessPlayerDeath();
 		}
 	}
 }
