@@ -1,14 +1,41 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class ScenePersist : MonoBehaviour
 {
-	private int startingSceneIndex;
-	
+	private int _sceneIndexofTheLastScene = 0;
+	private int _sceneIndexAtStart;
+    
+
 	private void Awake()
 	{
+		var actualSceneIndex = SceneManager.GetActiveScene().buildIndex;
+
+		if (_sceneIndexofTheLastScene == actualSceneIndex)
+		{
+			var numScenePersist = FindObjectsOfType<ScenePersist>().Length;
+			if (numScenePersist > 1)
+			{
+				Destroy(gameObject);
+				Debug.Log("ScenePersist has been destroyed due to Singleton");
+			}
+			else
+			{
+				DontDestroyOnLoad(gameObject);
+			}
+		}
+		else
+		{
+			StartCoroutine(Singleton());
+		}
+        
+	}
+
+	IEnumerator Singleton()
+	{
+		yield return new WaitForSecondsRealtime(Time.deltaTime);
+        
 		var numScenePersist = FindObjectsOfType<ScenePersist>().Length;
 		if (numScenePersist > 1)
 		{
@@ -20,19 +47,24 @@ public class ScenePersist : MonoBehaviour
 		}
 	}
 
-	// Use this for initialization
-	void Start ()
-	{
-		startingSceneIndex = SceneManager.GetActiveScene().buildIndex;
+	private void Start() {
+		_sceneIndexAtStart = SceneManager.GetActiveScene().buildIndex;
+		_sceneIndexofTheLastScene = SceneManager.GetActiveScene().buildIndex;
 	}
-	
-	// Update is called once per frame
-	void Update ()
-	{
-		var currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-		if (currentSceneIndex != startingSceneIndex)
+
+	void Update() {
+		CheckIfStillInSameScene();
+	}
+
+	private void CheckIfStillInSameScene(){
+		var actualSceneIndex = SceneManager.GetActiveScene().buildIndex;
+		if (actualSceneIndex != _sceneIndexAtStart)
 		{
 			Destroy(gameObject);
+		}
+		else
+		{
+			DontDestroyOnLoad(gameObject);
 		}
 	}
 }
